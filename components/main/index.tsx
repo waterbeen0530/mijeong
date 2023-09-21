@@ -1,22 +1,32 @@
 import { theme } from "@/styles/theme";
 import styled from "@emotion/styled";
+import { useEffect, useState } from "react";
+import { useSpeechRecognition, useSpeechSynthesis } from "react-speech-kit";
 
 export default function Main() {
-  const name =
-    typeof window !== "undefined"
-      ? localStorage.getItem("name") || "미정이"
-      : "미정이";
+  const [name, setName] = useState("");
+
+  const [value, setValue] = useState("");
+  const { listen, listening, stop } = useSpeechRecognition({
+    onResult: (result: any) => {
+      setValue(result);
+    },
+  });
+
+  useEffect(() => {
+    const name =
+      typeof window !== "undefined"
+        ? localStorage.getItem("name") || "미정이"
+        : "미정이";
+
+    setName(name);
+  }, []);
+
   return (
     <Container>
       <Background></Background>
       <Wrapper>
-        <TalkBox>
-          <DotBox>
-            <Dot></Dot>
-            <Dot></Dot>
-            <Dot></Dot>
-          </DotBox>
-        </TalkBox>
+        <TalkBox>{value}</TalkBox>
 
         <Text>헤헤 주인님 체고</Text>
         <Mijeong>
@@ -27,7 +37,7 @@ export default function Main() {
           </NameTag>
         </Mijeong>
 
-        <MikeBox>
+        <MikeBox onMouseDown={listen} onMouseUp={stop} onMouseLeave={stop}>
           <Circle3>
             <Circle2>
               <Circle1>
@@ -86,20 +96,9 @@ const TalkBox = styled.div`
   justify-content: center;
   background: linear-gradient(180deg, #fff 0%, rgba(255, 255, 255, 0.5) 100%);
   z-index: 4;
-`;
-
-const DotBox = styled.div`
-  gap: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const Dot = styled.div`
-  width: 10px;
-  height: 10px;
-  border-radius: 5px;
-  background-color: ${theme.GRAY2};
+  color: ${theme.GREEN};
+  font-size: 24px;
+  font-weight: 800;
 `;
 
 const Text = styled.div`
