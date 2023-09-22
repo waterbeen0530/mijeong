@@ -1,12 +1,33 @@
+import { bad } from "@/docs/Learning/bad";
+import { good } from "@/docs/Learning/good";
 import { theme } from "@/styles/theme";
+import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { useEffect, useState } from "react";
 import { useSpeechRecognition, useSpeechSynthesis } from "react-speech-kit";
 
 export default function Main() {
   const [name, setName] = useState("");
-
   const [value, setValue] = useState("");
+  const [answer, setAnswer] = useState("");
+
+  const resultAnswer = () => {
+    if (bad.test(value)) {
+      setAnswer("왜 욕함..서운..");
+      console.log("bad");
+      return null;
+    }
+
+    if (good.test(value)) {
+      setAnswer("헤헤 감사해오");
+      console.log("good");
+
+      return null;
+    }
+
+    setAnswer("말씀을 이해하지 못했어요");
+  };
+
   const { listen, listening, stop } = useSpeechRecognition({
     onResult: (result: any) => {
       setValue(result);
@@ -22,13 +43,17 @@ export default function Main() {
     setName(name);
   }, []);
 
+  useEffect(() => {
+    if (!listening) resultAnswer();
+  }, [listening]);
+
   return (
     <Container>
       <Background></Background>
       <Wrapper>
         <TalkBox>{value}</TalkBox>
 
-        <Text>헤헤 주인님 체고</Text>
+        <Text>{answer}</Text>
         <Mijeong>
           <Body src="/imgs/mijeong/default.png" />
           <Hair src="/imgs/mijeong/hair.png" />
@@ -37,7 +62,13 @@ export default function Main() {
           </NameTag>
         </Mijeong>
 
-        <MikeBox onMouseDown={listen} onMouseUp={stop} onMouseLeave={stop}>
+        <MikeBox
+          onMouseDown={listen}
+          onMouseUp={(e) => {
+            stop(e);
+          }}
+          onMouseLeave={stop}
+        >
           <Circle3>
             <Circle2>
               <Circle1>
@@ -99,6 +130,7 @@ const TalkBox = styled.div`
   color: ${theme.GREEN};
   font-size: 24px;
   font-weight: 800;
+  text-align: center;
 `;
 
 const Text = styled.div`
@@ -192,6 +224,24 @@ const Circle2 = styled.div`
   justify-items: center;
   background-color: rgba(166, 174, 65, 0.4);
   z-index: 20;
+
+  @keyframes subinsu {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  ${({ listening }: any) =>
+    listening &&
+    css`
+      animation: subinsu 1s infinite;
+    `}
 `;
 
 const Circle1 = styled.div`
